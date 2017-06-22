@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, Response, request, reqparse
-from flask_restful import Resource, Api
+from flask import Flask, jsonify, Response, request
+from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS, cross_origin
 from flask_json import JsonError, json_response, as_json
 from datetime import datetime
