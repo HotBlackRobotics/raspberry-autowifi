@@ -16,29 +16,29 @@ But we are currently working on that, in order to make the Raspberry building th
 To make things work, the following step must be followed for the correct installation.
 
 - install hostapd and isc-dhcp-server services
-	```sudo apt-get install hostapd isc-dchp-sever```
+	- ```sudo apt-get install hostapd isc-dchp-sever```
 
 - disable the activation of both services during the boot procedure
-	```sudo update-rc.d -f isc-dhcp-server remove```
-	```update-rc.d -f hostapd remove```
+	- ```sudo update-rc.d -f isc-dhcp-server remove```
+	- ```update-rc.d -f hostapd remove```
 
 - specify which is the file containing the hostapd configuration
-	```echo "DAEMON_CONF=\"/etc/hostapd/hostapd.conf\"" >> /etc/default/hostapd```
+	- ```echo "DAEMON_CONF=\"/etc/hostapd/hostapd.conf\"" >> /etc/default/hostapd```
 	
 - download the configuration files of hostapd, isc-dhcp-server and the network interfaces file
-	```git clone https://github.com/HotBlackRobotics/raspberry-autowifi.git```
+	- ```git clone https://github.com/HotBlackRobotics/raspberry-autowifi.git```
 
 - from the downloaded folder, copy the files in the right destination
-	```cp -f configs/interfaces /etc/network/interfaces```
-	```cp -f configs/dhcpd.conf /etc/dhcp/dhcpd.conf```
-	```cp configs/hostapd.conf /etc/hostapd/```
+	- ```cp -f configs/interfaces /etc/network/interfaces```
+	- ```cp -f configs/dhcpd.conf /etc/dhcp/dhcpd.conf```
+	- ```cp configs/hostapd.conf /etc/hostapd/```
 
 - set the auto-wifi script to be run at the boot time
-	```crontab -l > mycron```
-	```echo "@reboot /root/raspberry-autowifi/env/bin/python /root/raspberry-autowifi/scripts/autowifi.py >> /var/log/wifi_auto.log" >> mycron```
-	```crontab mycron```
-	```rm mycron```
-	```update-rc.d cron defaults```
+	- ```crontab -l > mycron```
+	- ```echo "@reboot /root/raspberry-autowifi/env/bin/python /root/raspberry-autowifi/scripts/autowifi.py >> /var/log/wifi_auto.log" >> mycron```
+	- ```crontab mycron```
+	- ```rm mycron```
+	- ```update-rc.d cron defaults```
 	
 ## Usage
 
