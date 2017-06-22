@@ -1,12 +1,13 @@
-from flask import Flask, current_app, g, jsonify, Response, request, redirect, url_for
+from flask import Flask, jsonify, Response, request, reqparse
 from flask_restful import Resource, Api
 from flask_cors import CORS, cross_origin
 from flask_json import JsonError, json_response, as_json
-from . import api
 from datetime import datetime
 import subprocess
 from wifi import Cell, Scheme
 from wifi.exceptions import ConnectionError
+
+from . import api
 
 rest_api = Api(api)
 
