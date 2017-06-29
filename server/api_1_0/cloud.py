@@ -40,7 +40,7 @@ class WifiSchemes(Resource):
         newscheme = None
         for cell in cells:
             if cell.ssid == args['name']:
-                if len(args['password']) > 0:
+                if cell.encrypted is True:
                     newscheme = Scheme.for_cell('wlan0', 'scheme-'+str(len(schemes)), cell, args['password'])
                 else:
                     newscheme = Scheme.for_cell('wlan0', 'scheme-'+str(len(schemes)), cell)
@@ -109,4 +109,3 @@ class WifiScheme(Resource):
 rest_api.add_resource(WifiCells, '/wifi/cells')
 rest_api.add_resource(WifiSchemes, '/wifi/schemes')
 rest_api.add_resource(WifiScheme, '/wifi/schemes/<name>')
-
