@@ -13,9 +13,10 @@ def autoconnect_command(interface):
             sys.stderr.write('Connecting to "%s".\n' % ssid)
             try:
                 scheme.activate()
+                connected = True
             except ConnectionError:
                 assert False, "Failed to connect to %s." % scheme.name
-            connected = True
+                connected = False
             break
     else:
         print "Couldn't find any schemes that are currently available."
