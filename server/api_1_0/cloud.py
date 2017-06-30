@@ -25,7 +25,7 @@ class WifiSchemes(Resource):
     def get(self):
         schemes = Scheme.all()
         pattern = re.compile("^scheme-\d*$")
-        sc = [s.__dict__ for s in schemes if pattern.match(s['name'])]
+        sc = [s.__dict__ for s in schemes if pattern.match(s.name)]
         return jsonify({'schemes': sorted(sc, key=lambda k: k[7:-1])})
 
     def post(self):
