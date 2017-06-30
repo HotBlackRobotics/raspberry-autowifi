@@ -89,25 +89,13 @@ class WifiScheme(Resource):
             scheme.save()
             return jsonify({'scheme': scheme.__dict__})
 
-# VECCHIO CODICE
-#        elif args["action"] == "clean":
-#            sname = scheme.name
-#            for s in Scheme.all():
-#                s.delete()
-#                if s.name == sname:
-#                    s = Scheme('wlan0', sname)
-#                s.save()
-
-# NUOVO CODICE
         elif args["action"] == "clean":
             sname = scheme.name
             for s in Scheme.all():
-#                s.delete()
                 if s.name == sname:
                     s = Scheme('wlan0', sname)
                     scheme.delete()
-                    s.save()
-                    
+                    s.save()       
         else:
             return jsonify({'scheme': scheme.__dict__})
 
