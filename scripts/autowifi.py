@@ -1,6 +1,7 @@
 #! env/bin/python
 
 from wifi import Scheme, Cell
+from wifi.exceptions import ConnectionError
 import sys
 
 def autoconnect_command(interface):
@@ -15,15 +16,18 @@ def autoconnect_command(interface):
                 scheme.activate()
                 connected = True
             except ConnectionError:
-                assert False, "Failed to connect to %s." % scheme.name
-                connected = False
+                print "Failed to connect to %s." % scheme.name
+                continue
+            connected = True
             break
-    else:
-        print "Couldn't find any schemes that are currently available."
 
     if not connected:
-        s = Scheme.find('wlan0', 'hotspot')
-        s.activate()
+	try:
+            s = Scheme.find('wlan0', 'hotspot')
+            s.activate()
+        except ConnectionError:
+            print "hotspot is created."
+        
 
 if __name__=='__main__':
     autoconnect_command('wlan0')
