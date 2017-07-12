@@ -6,7 +6,7 @@ from datetime import datetime
 import subprocess
 from wifi import Cell, Scheme
 from wifi.exceptions import ConnectionError
-
+import re
 from . import api
 
 rest_api = Api(api)
@@ -24,7 +24,9 @@ class WifiCells(Resource):
 class WifiSchemes(Resource):
     def get(self):
         schemes = Scheme.all()
-        return jsonify({'schemes': [s.__dict__ for s in schemes]})
+        pattern = re.compile("^scheme-\d*$")
+        sc = [s.__dict__ for s in schemes if pattern.match(s.name)]
+        return jsonify({'schemes': sc})
 
     def post(self):
         parser = reqparse.RequestParser()
@@ -38,7 +40,10 @@ class WifiSchemes(Resource):
         newscheme = None
         for cell in cells:
             if cell.ssid == args['name']:
-                newscheme = Scheme.for_cell('wlan0', 'scheme-'+str(len(schemes)), cell, args['password'])
+                if cell.encrypted is True:
+                    newscheme = Scheme.for_cell('wlan0', 'scheme-'+str(len(schemes)), cell, args['password'])
+                else:
+                    newscheme = Scheme.for_cell('wlan0', 'scheme-'+str(len(schemes)), cell)
                 break
         if newscheme is None:
             return jsonify({'response': "network non found"})
@@ -79,19 +84,18 @@ class WifiScheme(Resource):
             if len(cells) == 0:
                 return jsonify({'error': 'wifi not found'})
             sname = scheme.name
-
 	    scheme.delete()
             scheme = Scheme.for_cell('wlan0', sname, cells[0], args['password'])
             scheme.save()
             return jsonify({'scheme': scheme.__dict__})
+
         elif args["action"] == "clean":
             sname = scheme.name
             for s in Scheme.all():
-                s.delete()
                 if s.name == sname:
                     s = Scheme('wlan0', sname)
-                s.save()
-
+                    scheme.delete()
+                    s.save()       
         else:
             return jsonify({'scheme': scheme.__dict__})
 
@@ -103,9 +107,6 @@ class WifiScheme(Resource):
         else:
             return jsonify({'response': "non found"})
 
-
-
 rest_api.add_resource(WifiCells, '/wifi/cells')
 rest_api.add_resource(WifiSchemes, '/wifi/schemes')
 rest_api.add_resource(WifiScheme, '/wifi/schemes/<name>')
-
