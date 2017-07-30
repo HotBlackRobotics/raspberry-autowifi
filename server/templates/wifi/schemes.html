@@ -27,7 +27,7 @@
       data: {'action': 'clean'},
       success: function(data) {
         console.log(data);
-        alert('done');
+        window.location.href = '/wifi/schemes'
       },
     });
   }
@@ -41,7 +41,7 @@
     cell3 = document.createElement("td");
     textnode1=document.createTextNode(scheme.name);
     console.log(scheme);
-    if (scheme.options["wpa-ssid"] === undefined) {
+    if (scheme.options["wpa-ssid"] === undefined && scheme.options["wireless-essid"] === undefined) {
       button = document.createElement("a")
       button.setAttribute("type","button")
       button.setAttribute("class","btn btn-xs btn-default")
@@ -49,18 +49,18 @@
       button.appendChild(document.createTextNode("configure"));
       cell3.appendChild(button);
     } else {
-      textnode2=document.createTextNode(scheme.options["wpa-ssid"]);
+      textnode2=document.createTextNode(scheme.options["wpa-ssid"] || scheme.options["wireless-essid"]);
       button = document.createElement("button")
       button.setAttribute("type","button")
       button.setAttribute("class","btn btn-xs btn-info")
       button.onclick = function() {connectToScheme(scheme);};
-      button.appendChild(document.createTextNode("connect"));
+      button.appendChild(document.createTextNode("connetti"));
 
       button_del = document.createElement("button")
       button_del.setAttribute("type","button")
       button_del.setAttribute("class","btn btn-xs btn-danger")
       button_del.onclick = function() {cleanScheme(scheme);};
-      button_del.appendChild(document.createTextNode("clean"));
+      button_del.appendChild(document.createTextNode("cancella"));
 
       cell2.appendChild(textnode2);
       cell3.appendChild(button);
@@ -91,8 +91,8 @@
 {% block page_content %}
 
 <div class="container">
-<h2>Wifi Configuration</h2>
-<p>Connected to: {{ wifi_name }}</p>
+<h2>Configurazione WiFi</h2>
+<p>connesso a: <strong>{{ wifi_name }}</strong></p>
 <table class="table">
   <thead>
     <tr>

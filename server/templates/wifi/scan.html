@@ -13,7 +13,7 @@
     cell1 = document.createElement("td");
     cell2 = document.createElement("td");
     textnode1=document.createTextNode(cell.name);
-    textnode2=document.createTextNode(cell.encryption);
+    textnode2=document.createTextNode(cell.encryption || 'libera');
     cell1.appendChild(textnode1);
     cell2.appendChild(textnode2);
     row.appendChild(cell1);
@@ -39,13 +39,13 @@
 {% block page_content %}
 
 <div class="container">
-<h2>Basic Table</h2>
-<p>The .table class adds basic styling (light padding and only horizontal dividers) to a table:</p>
+<h2>Ricerca Reti</h2>
+<p>Seleziona la rete a cui vuoi connetterti</p>
 <table class="table">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Type</th>
+      <th>Nome</th>
+      <th>Tipo</th>
     </tr>
   </thead>
   <tbody>
