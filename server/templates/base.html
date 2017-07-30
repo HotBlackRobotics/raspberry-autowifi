@@ -1,10 +1,23 @@
-{% extends "bootstrap/base.html" %} {% block title %} HBrain-CI Interface{% endblock %} {% block scripts %} {{ super() }}
+{% extends "bootstrap/base.html" %}
+{% block title %} O|Robot {% endblock %}
+
+{% block scripts %}
+{{ super() }}
 
 <script type="text/javascript">
-	var master_url = "{{ g.MASTER_URL }}";
-	var dotbot_name = "{{ g.DOTBOT_NAME }}"
-	console.log("master url: ", master_url);
-	console.log("dotbot name: ", dotbot_name);
+function robot_cmd(cmd) {
+	$.ajax({
+		url: '/api/v1.0/manage/robot',
+		data: {'command': cmd},
+		type: 'POST',
+		dataType: 'json',
+		success: function(result) {
+			console.log(result);
+			alert("Ok...");
+		}
+	});
+}
+
 </script>
 {% endblock %}
 
@@ -14,9 +27,20 @@
 	<div class="container">
 		<div class="navbar-header">
 			<a class="navbar-brand" href="/">
-				<img style="max-width:200px;margin-top: -7px;" src="/static/img/brand.png">
+				O|Robot 101
 			</a>
 		</div>
+		<div class="navbar-collapse collapse">
+		<ul class="nav navbar-nav navbar-right">
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-off" style="color:red"></span>  <span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					<li><a type="button" onclick="robot_cmd('poweroff')">Spegni</a></li>
+					<li><a type="button" onclick="robot_cmd('reboot')">Riavvia</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
 	</div>
 </div>
 </div>
@@ -34,23 +58,6 @@
 </div>
 
 <div class="container_main">
-
-	<!-- Modal -->
-	<div class="modal fade" id="shellModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-	  <div class="modal-dialog" role="document">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 class="modal-title" id="shellLabel"> Shell </h4>
-	      </div>
-	        <div class="modal-body" id="my_console" style="height:600px">
-	        </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
 
 	{% block page_content %}
 	{% endblock %}

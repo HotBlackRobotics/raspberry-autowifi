@@ -26,6 +26,7 @@ class WifiSchemes(Resource):
         schemes = Scheme.all()
         pattern = re.compile("^scheme-\d*$")
         sc = [s.__dict__ for s in schemes if pattern.match(s.name)]
+        sc = sorted(sc, key=lambda s: s['name'])
         return jsonify({'schemes': sc})
 
     def post(self):
@@ -95,7 +96,7 @@ class WifiScheme(Resource):
                 if s.name == sname:
                     s = Scheme('wlan0', sname)
                     scheme.delete()
-                    s.save()       
+                    s.save()
         else:
             return jsonify({'scheme': scheme.__dict__})
 

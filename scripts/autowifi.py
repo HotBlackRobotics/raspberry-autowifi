@@ -27,7 +27,24 @@ def autoconnect_command(interface):
             s.activate()
         except ConnectionError:
             print "hotspot is created."
-        
+
+def get_cpu_id():
+    cpuserial = "0000000000000000"
+    try:
+      f = open('/proc/cpuinfo','r')
+      for line in f:
+        if line[0:6]=='Serial':
+          cpuserial = line[10:26]
+      f.close()
+    except:
+      cpuserial = "ERROR000000000"
+    return cpuserial
+
 
 if __name__=='__main__':
+    with open('/var/run/hostapd.conf', 'w') as hostapd_file:
+        hostapd_file.write("interface=wlan0\n")
+        hostapd_file.write("hw_mode=g\n")
+        hostapd_file.write("channel=6\n")
+        hostapd_file.write("ssid=orobot.%s\n"%get_cpu_id()[7:])
     autoconnect_command('wlan0')
