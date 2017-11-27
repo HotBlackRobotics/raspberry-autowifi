@@ -8,7 +8,6 @@ def autoconnect_command(interface):
     ssids = [cell.ssid for cell in Cell.all(interface)]
     connected = False
     for scheme in [Scheme.find('wlan0', s) for s in ['scheme-'+str(x) for x in range(1,6)]]:
-
         ssid = scheme.options.get('wpa-ssid', scheme.options.get('wireless-essid'))
         if ssid in ssids:
             sys.stderr.write('Connecting to "%s".\n' % ssid)
@@ -42,9 +41,14 @@ def get_cpu_id():
 
 
 if __name__=='__main__':
-    with open('/var/run/hostapd.conf', 'w') as hostapd_file:
+    import time
+    import os
+    net_name = os.environ.get('SSID_NAME') or 'hbr.demo'
+    with open('/etc/hostapd/hostapd.conf', 'w') as hostapd_file:
         hostapd_file.write("interface=wlan0\n")
         hostapd_file.write("hw_mode=g\n")
         hostapd_file.write("channel=6\n")
-        hostapd_file.write("ssid=orobot.%s\n"%get_cpu_id()[7:])
+        hostapd_file.write("ssid=%s.%s\n"%(net_name, get_cpu_id()[7:]))
     autoconnect_command('wlan0')
+    while True:
+        time.sleep(10)

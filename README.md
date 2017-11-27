@@ -24,7 +24,7 @@ To make things work, the following step must be followed for the correct install
 
 - specify which is the file containing the hostapd configuration
 	- ```echo "DAEMON_CONF=\"/etc/hostapd/hostapd.conf\"" >> /etc/default/hostapd```
-	
+
 - download the configuration files of hostapd, isc-dhcp-server and the network interfaces file
 	- ```git clone https://github.com/HotBlackRobotics/raspberry-autowifi.git```
 
@@ -39,7 +39,7 @@ To make things work, the following step must be followed for the correct install
 	- ```crontab mycron```
 	- ```rm mycron```
 	- ```update-rc.d cron defaults```
-	
+
 ## Usage
 
 if no known networks are detected, run the following command from the Raspberry to build up the server:
@@ -57,5 +57,3 @@ then, once you are connected to the Raspberry wifi network, go to this page:
 ## License
 
 This project is licensed under the GNU General Public License - see the [LICENSE.md](LICENSE.md) file for details
-
-
