@@ -26,10 +26,10 @@ scheme_model = rest_api.model('Scheme', {
     'options': fields.Raw(required=True, description='Scheme info')
 })
 
-
-connect_parser = reqparse.RequestParser()
-connect_parser.add_argument('ssid', type=str, location='form', help='ssid of network to connect')
-connect_parser.add_argument('password', type=str, location='form', help='password of network to connect', required=False)
+connect_model = rest_api.model('Connection', {
+    'ssid': fields.String(required=True, description='Network SSID'),
+    'password': fields.String(required=False, description='Network Password')
+})
 
 
 @rest_api.route('/cells')
@@ -53,10 +53,11 @@ class Schemes(Resource):
         sc = sorted(sc, key=lambda s: s['name'])
         return sc
 
-    @rest_api.expect(connect_parser)
+    @rest_api.expect(connect_model)
     @rest_api.marshal_with(scheme_model)
     def post(self):
-        args = connect_parser.parse_args()
+        args = rest_api.payload
+        print args
         schemes = [s for s in Scheme.all()]
         cells = Cell.all('wlan0')
 
