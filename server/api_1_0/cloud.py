@@ -15,7 +15,7 @@ rest_api = Api(api, version='1.0', title='WiFi RPi3 API',
 
 wifi_cells_model = rest_api.model('Cells', {
     'ssid': fields.String(required=True, description='Wifi Cell SSID'),
-    'encrypted': fields.String(required=True, description='Wifi is Encrypted'),
+    'encrypted': fields.Boolean(required=True, description='Wifi is Encrypted'),
     'encryption': fields.String(required=True, description='Wifi Encryption Type')
 })
 
