@@ -53,7 +53,7 @@ class WifiSchemes(Resource):
         sc = sorted(sc, key=lambda s: s['name'])
         return jsonify({'schemes': sc})
 
-    @expect(connect_parser)
+    @rest_api.expect(connect_parser)
     @rest_api.marshal_with(scheme_model)
     def post(self):
         args = connect_parser.parse_args()
