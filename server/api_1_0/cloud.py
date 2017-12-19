@@ -29,7 +29,7 @@ scheme_model = rest_api.model('Scheme', {
 
 connect_parser = reqparse.RequestParser()
 connect_parser.add_argument('ssid', type=str, location='form', help='ssid of network to connect')
-connect_parser.add_argument('password', type=str, location='form' help='password of network to connect', required=False)
+connect_parser.add_argument('password', type=str, location='form', help='password of network to connect', required=False)
 
 
 @rest_api.route('/cells')
