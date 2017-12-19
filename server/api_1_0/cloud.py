@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, Response, request
-from flask_restplus import Resource, Api, fields, marshal_with_field, marshal_with
+from flask_restplus import Resource, Api, fields
 from flask_cors import CORS, cross_origin
 from flask_json import JsonError, json_response, as_json
 from datetime import datetime
@@ -21,7 +21,7 @@ wifi_cells_model = rest_api.model('Cells', {
 
 @rest_api.route('/cells')
 class Cells(Resource):
-    @rest_api.marshal_with_field(fields.List(fields.Nested(wifi_cells_model)))
+    @rest_api.marshal_with(fields.List(fields.Nested(wifi_cells_model)))
     def get(self):
         cells = Cell.all('wlan0')
         wifi_cells = []
