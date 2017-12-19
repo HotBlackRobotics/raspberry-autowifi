@@ -81,7 +81,7 @@ class WifiScheme(Resource):
         scheme = self.find_scheme(name)
         args = rest_api.payload
         try:
-            cells = next(cell for cell in Cell.all("wlan0") if cell.ssid == args['ssid'])
+            cell = next(cell for cell in Cell.all("wlan0") if cell.ssid == args['ssid'])
         except StopIteration:
             abort(404, "Cell not found")
         scheme.delete()
