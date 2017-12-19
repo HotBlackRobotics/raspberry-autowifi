@@ -56,7 +56,7 @@ class Schemes(Resource):
 @rest_api.route('/schemes/<name>')
 class WifiScheme(Resource):
 
-    def find_scheme(name):
+    def find_scheme(self, name):
         try:
             scheme = next(s for s in Scheme.all() if s.name == name)
         except StopIteration:
