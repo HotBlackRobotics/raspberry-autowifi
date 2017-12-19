@@ -21,7 +21,7 @@ wifi_cells_model = rest_api.model('Cells', {
 
 @rest_api.route('/cells')
 class Cells(Resource):
-    @rest_api.marshal_with_list(fields.List(fields.Nested(wifi_cells_model)))
+    @rest_api.marshal_list_with(wifi_cells_model)
     def get(self):
         cells = Cell.all('wlan0')
         wifi_cells = []
