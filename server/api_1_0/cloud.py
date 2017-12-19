@@ -13,7 +13,7 @@ rest_api = Api(api, version='1.0', title='WiFi RPi3 API',
     description='Simple WiFi API to manage RPi3 Connection',
 )
 
-wifi_cells_model = rest_api.model('Cells', {
+cell_model = rest_api.model('Cell', {
     'ssid': fields.String(required=True, description='Wifi Cell SSID'),
     'encrypted': fields.Boolean(required=True, description='Wifi is Encrypted'),
     'encryption': fields.String(required=True, description='Wifi Encryption Type')
@@ -34,7 +34,7 @@ connect_parser.add_argument('password', type=str, location='form', help='passwor
 
 @rest_api.route('/cells')
 class Cells(Resource):
-    @rest_api.marshal_list_with(wifi_cells_model)
+    @rest_api.marshal_list_with(cell_model)
     def get(self):
         cells = Cell.all('wlan0')
         wifi_cells = []
@@ -44,14 +44,14 @@ class Cells(Resource):
         return wifi_cells
 
 @rest_api.route('/schemes')
-class WifiSchemes(Resource):
+class Schemes(Resource):
     @rest_api.marshal_list_with(scheme_model)
     def get(self):
         schemes = Scheme.all()
         pattern = re.compile("^scheme-\d*$")
         sc = [s.__dict__ for s in schemes if pattern.match(s.name)]
         sc = sorted(sc, key=lambda s: s['name'])
-        return jsonify({'schemes': sc})
+        return sc
 
     @rest_api.expect(connect_parser)
     @rest_api.marshal_with(scheme_model)
