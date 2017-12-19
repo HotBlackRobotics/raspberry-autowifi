@@ -86,9 +86,9 @@ class WifiScheme(Resource):
             abort(404, "Cell not found")
         scheme.delete()
         if cell.encrypted is True:
-            scheme = Scheme.for_cell('wlan0', name, cells[0], args['password'])
+            scheme = Scheme.for_cell('wlan0', name, cell, args['password'])
         else:
-            scheme = Scheme.for_cell('wlan0', name, cells[0])
+            scheme = Scheme.for_cell('wlan0', name, cell)
         scheme.save()
         return scheme.__dict__
 
