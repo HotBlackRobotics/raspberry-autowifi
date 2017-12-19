@@ -39,7 +39,7 @@ class Cells(Resource):
         cells = Cell.all('wlan0')
         wifi_cells = []
         for c in cells:
-            if c.ssid not in [wc['name'] for wc in wifi_cells] + ["\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"]:
+            if c.ssid not in [wc['ssid'] for wc in wifi_cells] + ["\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"]:
                 wifi_cells.append({'ssid': c.ssid, 'encryption': c.encryption_type, 'encrypted': c.encrypted})
         return wifi_cells
 
@@ -99,13 +99,4 @@ class WifiScheme(Resource):
             scheme.activate()
         except ConnectionError:
             abort(404, "Failed to connect to {}.".format(name))
-        return jsonify({'scheme': scheme.__dict__, "connected": True})
-
-    @rest_api.marshal_with(scheme_model)
-    def delete(self, name):
-        s = [s for s in Scheme.all() if s.name == name]
-        if len(s) > 0:
-            s[0].delete()
-            return jsonify({'response': "ok"})
-        else:
-            return jsonify({'response': "non found"})
+        return scheme.__dict__
