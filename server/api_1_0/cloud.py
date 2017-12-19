@@ -28,7 +28,7 @@ scheme_model = rest_api.model('Scheme', {
 
 connect_model = rest_api.model('Connection', {
     'ssid': fields.String(required=True, description='Network SSID'),
-    'password': fields.String(required=False, description='Network Password')
+    'password': fields.String(required=False, description='Network Password'),
 })
 
 
@@ -53,80 +53,55 @@ class Schemes(Resource):
         sc = sorted(sc, key=lambda s: s['name'])
         return sc
 
-    @rest_api.expect(connect_model)
-    @rest_api.marshal_with(scheme_model)
-    def post(self):
-        args = rest_api.payload
-        print args
-        schemes = [s for s in Scheme.all()]
-        cells = Cell.all('wlan0')
-
-        newscheme = None
-        for cell in cells:
-            if cell.ssid == args['ssid']:
-                if cell.encrypted is True:
-                    newscheme = Scheme.for_cell('wlan0', 'scheme-'+str(len(schemes)), cell, args['password'])
-                else:
-                    newscheme = Scheme.for_cell('wlan0', 'scheme-'+str(len(schemes)), cell)
-                break
-        if newscheme is None:
-            abort(404, "network not found")
-        else:
-            newscheme.save()
-            newscheme.activate()
-            return s.__dict__
-
 @rest_api.route('/schemes/<name>')
 class WifiScheme(Resource):
+
+    def find_scheme(name):
+        try:
+            scheme = next(s for s in Scheme.all() if s.name == name)
+        except StopIteration:
+            abort(404, "scheme not found")
+        return scheme
+
+    @rest_api.marshal_with(scheme_model)
     def get(self, name):
-        parser = reqparse.RequestParser()
-        parser.add_argument('action')
-        args = parser.parse_args()
-        s = [s for s in Scheme.all() if s.name == name]
-        if len(s) == 0:
-            return jsonify({'response': "non found"})
-        scheme = s[0]
-        return jsonify({'scheme': scheme.__dict__})
+        return self.find_scheme(name).__dict__
 
-    def put(self, name):
-        parser = reqparse.RequestParser()
-        parser.add_argument('action')
-        parser.add_argument('ssid')
-        parser.add_argument('password')
-        args = parser.parse_args()
-        s = [s for s in Scheme.all() if s.name == name]
-        if len(s) == 0:
-            return jsonify({'response': "non found"})
-        scheme = s[0]
-        if args["action"] == 'connect':
-            try:
-                scheme.activate()
-            except ConnectionError:
-                return  jsonify({"error": "Failed to connect to %s." % scheme.name})
-            return jsonify({'scheme': scheme.__dict__, "connected": True})
-        elif args["action"] == "configure":
-            cells = [cell for cell in Cell.all("wlan0") if cell.ssid == args['ssid']]
-            if len(cells) == 0:
-                return jsonify({'error': 'wifi not found'})
-            sname = scheme.name
-            scheme.delete()
-            if cell.encrypted is True:
-                scheme = Scheme.for_cell('wlan0', sname, cells[0], args['password'])
-            else:
-                scheme = Scheme.for_cell('wlan0', sname, cells[0])
-            scheme.save()
-            return jsonify({'scheme': scheme.__dict__})
+    @rest_api.marshal_with(scheme_model)
+    def delete(self, name):
+        scheme = self.find_scheme(name)
+        scheme.delete()
+        scheme = Scheme('wlan0', name)
+        scheme.save()
+        return scheme.__dict__
 
-        elif args["action"] == "clean":
-            sname = scheme.name
-            for s in Scheme.all():
-                if s.name == sname:
-                    s = Scheme('wlan0', sname)
-                    scheme.delete()
-                    s.save()
+    @rest_api.expect(connect_model)
+    @rest_api.marshal_with(scheme_model)
+    def post(self, name):
+        scheme = self.find_scheme(name)
+        args = rest_api.payload
+        try:
+            cells = next(cell for cell in Cell.all("wlan0") if cell.ssid == args['ssid'])
+        except StopIteration:
+            abort(404, "Cell not found")
+        scheme.delete()
+        if cell.encrypted is True:
+            scheme = Scheme.for_cell('wlan0', sname, cells[0], args['password'])
         else:
-            return jsonify({'scheme': scheme.__dict__})
+            scheme = Scheme.for_cell('wlan0', sname, cells[0])
+        scheme.save()
+        return scheme.__dict__
 
+    @rest_api.marshal_with(scheme_model)
+    def put(self, name):
+        scheme = self.find_scheme(name)
+        try:
+            scheme.activate()
+        except ConnectionError:
+            abort(404, "Failed to connect to {}.".format(name))
+        return jsonify({'scheme': scheme.__dict__, "connected": True})
+
+    @rest_api.marshal_with(scheme_model)
     def delete(self, name):
         s = [s for s in Scheme.all() if s.name == name]
         if len(s) > 0:
