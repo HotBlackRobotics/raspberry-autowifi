@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, Response, request
-from flask_restplus import Resource, Api, reqparse
+from flask_restplus import Resource, Api, fields
 from flask_cors import CORS, cross_origin
 from flask_json import JsonError, json_response, as_json
 from datetime import datetime
@@ -24,11 +24,11 @@ class Cells(Resource):
     @rest_api.marshal_with_list(wifi_cells_model)
     def get(self):
         cells = Cell.all('wlan0')
-        wifi_info = []
+        wifi_cells = []
         for c in cells:
             if c.ssid not in [wc['name'] for wc in wifi_info] + ["\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"]:
-                wifi_info.append({'name': c.ssid, 'encryption': c.encryption_type, 'encrypted': c.encrypted})
-        return jsonify({'cells': wifi_info})
+                wifi_cells.append({'name': c.ssid, 'encryption': c.encryption_type, 'encrypted': c.encrypted})
+        return wifi_cells
 
 @rest_api.route('/schemes')
 class WifiSchemes(Resource):
