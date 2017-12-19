@@ -26,7 +26,7 @@ class Cells(Resource):
         cells = Cell.all('wlan0')
         wifi_cells = []
         for c in cells:
-            if c.ssid not in [wc['name'] for wc in wifi_info] + ["\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"]:
+            if c.ssid not in [wc['name'] for wc in wifi_cells] + ["\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"]:
                 wifi_cells.append({'name': c.ssid, 'encryption': c.encryption_type, 'encrypted': c.encrypted})
         return wifi_cells
 
