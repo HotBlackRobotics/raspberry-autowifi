@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, Response, request
+from flask import Flask, jsonify, Response, request, abort
 from flask_restplus import Resource, Api, fields
 from flask_cors import CORS, cross_origin
 from flask_json import JsonError, json_response, as_json
@@ -19,6 +19,19 @@ wifi_cells_model = rest_api.model('Cells', {
     'encryption': fields.String(required=True, description='Wifi Encryption Type')
 })
 
+
+scheme_model = rest_api.model('Scheme', {
+    'interface': fields.String(required=True, description='Interfaced of network'),
+    'name': fields.String(required=True, description='Wifi Scheme Name'),
+    'options': fields.Raw(required=True, description='Scheme info')
+})
+
+
+connect_parser = reqparse.RequestParser()
+connect_parser.add_argument('ssid', type=str, location='form', help='ssid of network to connect')
+connect_parser.add_argument('password', type=str, location='form' help='password of network to connect', required=False)
+
+
 @rest_api.route('/cells')
 class Cells(Resource):
     @rest_api.marshal_list_with(wifi_cells_model)
@@ -32,6 +45,7 @@ class Cells(Resource):
 
 @rest_api.route('/schemes')
 class WifiSchemes(Resource):
+    @rest_api.marshal_list_with(scheme_model)
     def get(self):
         schemes = Scheme.all()
         pattern = re.compile("^scheme-\d*$")
@@ -39,29 +53,27 @@ class WifiSchemes(Resource):
         sc = sorted(sc, key=lambda s: s['name'])
         return jsonify({'schemes': sc})
 
+    @expect(connect_parser)
+    @rest_api.marshal_with(scheme_model)
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('name')
-        parser.add_argument('password')
-        args = parser.parse_args()
-
+        args = connect_parser.parse_args()
         schemes = [s for s in Scheme.all()]
         cells = Cell.all('wlan0')
 
         newscheme = None
         for cell in cells:
-            if cell.ssid == args['name']:
+            if cell.ssid == args['ssid']:
                 if cell.encrypted is True:
                     newscheme = Scheme.for_cell('wlan0', 'scheme-'+str(len(schemes)), cell, args['password'])
                 else:
                     newscheme = Scheme.for_cell('wlan0', 'scheme-'+str(len(schemes)), cell)
                 break
         if newscheme is None:
-            return jsonify({'response': "network non found"})
+            abort(404, "network not found")
         else:
             newscheme.save()
             newscheme.activate()
-            return jsonify({'response': "ok"})
+            return s.__dict__
 
 @rest_api.route('/schemes/<name>')
 class WifiScheme(Resource):
