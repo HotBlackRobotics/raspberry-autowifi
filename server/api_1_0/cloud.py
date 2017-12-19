@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, Response, request
-from flask_restful import Resource, Api, reqparse
+from flask_restplus import Resource, Api, reqparse
 from flask_cors import CORS, cross_origin
 from flask_json import JsonError, json_response, as_json
 from datetime import datetime
@@ -9,10 +9,19 @@ from wifi.exceptions import ConnectionError
 import re
 from . import api
 
-rest_api = Api(api)
+rest_api = Api(api, version='1.0', title='WiFi RPi3 API',
+    description='Simple WiFi API to manage RPi3 Connection',
+)
 
+wifi_cells_model = rest_api.model('Cells', {
+    'ssid': fields.String(required=True, description='Wifi Cell SSID'),
+    'encrypted': fields.String(required=True, description='Wifi is Encrypted'),
+    'encryption': fields.String(required=True, description='Wifi Encryption Type')
+})
 
-class WifiCells(Resource):
+@rest_api.route('/cells')
+class Cells(Resource):
+    @rest_api.marshal_with_list(wifi_cells_model)
     def get(self):
         cells = Cell.all('wlan0')
         wifi_info = []
@@ -21,6 +30,7 @@ class WifiCells(Resource):
                 wifi_info.append({'name': c.ssid, 'encryption': c.encryption_type, 'encrypted': c.encrypted})
         return jsonify({'cells': wifi_info})
 
+@rest_api.route('/schemes')
 class WifiSchemes(Resource):
     def get(self):
         schemes = Scheme.all()
@@ -53,6 +63,7 @@ class WifiSchemes(Resource):
             newscheme.activate()
             return jsonify({'response': "ok"})
 
+@rest_api.route('/schemes/<name>')
 class WifiScheme(Resource):
     def get(self, name):
         parser = reqparse.RequestParser()
@@ -110,7 +121,3 @@ class WifiScheme(Resource):
             return jsonify({'response': "ok"})
         else:
             return jsonify({'response': "non found"})
-
-rest_api.add_resource(WifiCells, '/wifi/cells')
-rest_api.add_resource(WifiSchemes, '/wifi/schemes')
-rest_api.add_resource(WifiScheme, '/wifi/schemes/<name>')

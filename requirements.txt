@@ -17,3 +17,4 @@ pytz==2017.2
 six==1.10.0
 visitor==0.1.3
 wifi==0.3.8
+Flask-Restplus
