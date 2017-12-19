@@ -27,7 +27,7 @@ class Cells(Resource):
         wifi_cells = []
         for c in cells:
             if c.ssid not in [wc['name'] for wc in wifi_cells] + ["\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"]:
-                wifi_cells.append({'name': c.ssid, 'encryption': c.encryption_type, 'encrypted': c.encrypted})
+                wifi_cells.append({'ssid': c.ssid, 'encryption': c.encryption_type, 'encrypted': c.encrypted})
         return wifi_cells
 
 @rest_api.route('/schemes')
